@@ -10,8 +10,7 @@
 //変数宣言
 int i,j;//ループ用
 
-int  iti_flag[23][26];
-char iti[23][26];//文字列変数
+char iti[23][25];//
 
 ///構造体/////////////////////////////////
 //四角の構造体
@@ -41,25 +40,44 @@ void idou(void);//移動関数
 
 void main (){	
 	init();//初期化
+	
+
+	for(i=0;i<23;i++){
+		
+		iti[i][]="0000000000000000000000";
+		
+	}
+
+	iti[10][10]='3';
+
+	for(i=0;i<23;i++){
+			puts(iti[i][0]);
+
+	}
+
+
 	yokosen();//横線を引く
 
 	//ゲームループ
 	while(1){
-		hyouji();//表示
-		idou();//移動
-		sq.sp--;//カウンタマイナス		
+			
+		
+
+		//hyouji();//表示
+		//idou();//移動
+		//sq.sp--;//カウンタマイナス		
 	}	
 }
 
 void init(){
-	setCursor(0);//カーソルを表示しない
-
 	sq.x_S=12;//初期ｘ座標
 	sq.y_S=0;	//初期ｙ座標
 	sq.x=sq.x_S;
 	sq.y=sq.y_S;
 	sq.sp_S=1000;//スピード初期値
-	sq.sp=sq.sp_S;//スピード初期値代入	
+	sq.sp=sq.sp_S;//スピード初期値代入
+
+	setCursor(0);//カーソルを表示しない
 		
 }
 
@@ -73,30 +91,34 @@ void yokosen(){
 void hyouji(){
 
 	locate(sq.x,sq.y);//四角を画面上方に表示
-	puts("■");
+	printf("■\n");
+
 	if(sq.sp==0 && sq.y!=22){
 		locate(sq.x,sq.y);//四角を画面上方に表示
-		/*printf("  \n");*/
-		puts("　");
+		printf("  \n");
 
 	}
 	if(sq.y==22){
+
 		locate(sq.x,sq.y);//四角を画面上方に表示
-		puts("■");
+		printf("■\n");
 		getch();
 		locate(11,12);
 		printf("終了\n\n");
 		exit(0);//終了
 
 	}
-	
+
+
 }
 
 void idou(){
 	if(sq.sp==0 && sq.y!=22){
 			sq.y++;//四角を下に落とす
 			sq.sp=sq.sp_S;
-		}	
+		}
+
+
 
 }
 
