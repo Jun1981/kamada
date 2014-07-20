@@ -199,8 +199,8 @@ void line_chk(){
 		for (i = 0; i < 25; i += 2){
 			for (j = 0; j < sq.y; j++){
 				if (sq.iti_tmp[i][j] == 1){
-					sq.iti[i][j+1] = 1;
-					locate(i, j+1);//場所
+					sq.iti[i][j + 1] = 1;
+					locate(i, j + 1);//場所
 					puts("■");//表示	
 
 
@@ -210,8 +210,8 @@ void line_chk(){
 		}
 		//一時フラグに全部0を入れる
 		for (i = 0; i < 25; i += 2){
-			for (j = 0; j < 23; j++){				
-					sq.iti_tmp[i][j] = 0;				
+			for (j = 0; j < 23; j++){
+				sq.iti_tmp[i][j] = 0;
 			}
 		}
 
