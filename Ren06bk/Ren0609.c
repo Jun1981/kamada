@@ -27,6 +27,10 @@ struct shikaku{
 	int line[23];//一列チェック用
 	int iti[25][23];//位置
 	int iti_tmp[25][23];//位置フラグ一時保管用
+
+	int d_type;//白黒識別用
+	int b_type[25][23];//積み上がったブロックのタイプ
+	int b_type_tmp[25][23];
 }sq;
 
 //////////////////////////////////////////
@@ -35,13 +39,15 @@ struct shikaku{
 //プロトタイプ関数宣言
 void init(void);//変数などの初期化
 void yokosen(void);//下に線を
-void hyouji(void);//表示関数
+void d_hyouji(void);//落下表示関数
+
 void kesu(void);//消去関数
 void rakka(void);//移動関数
 
 void S_chk(void);//下にブロックがいるかチェック
 void line_chk(void);//一列ならんだかどうかチェック
 void key_chk(void);//キーチェック
+void type_chk(void);//白黒チェック関数
 
 void counter(void);//カウンタ
 
@@ -51,7 +57,9 @@ void main(){
 
 	//ゲームループ
 	while (1){
-		hyouji();//表示		
+		
+		
+		d_hyouji();//表示		
 		key_chk();//キーチェック			
 		rakka();//移動
 		//line_chk();//一列並んでるかどうかチェック
@@ -60,6 +68,9 @@ void main(){
 }
 
 void init(){
+	srand((unsigned)time(NULL));//時間からランダム
+	type_chk();//最初の□のタイプをランダムで決定
+	//sq.type = 0;//デフォ黒四角
 	sq.x_S = 12;//初期ｘ座標
 	sq.y_S = 0;	//初期ｙ座標
 	sq.x = sq.x_S;
@@ -76,9 +87,13 @@ void init(){
 		for (j = 0; j < 23; j++){
 			sq.iti[i][j] = 0;
 			sq.line[j] = 0;
+			sq.b_type[i][j] = 0;//全部■
 
 		}
 	}
+
+
+
 }
 
 void yokosen(){
@@ -93,9 +108,14 @@ void yokosen(){
 }
 
 
-void hyouji(){
+void d_hyouji(){
 	locate(sq.x, sq.y);//四角を画面上方に表示
-	printf("■\n");
+	if (sq.d_type == 0){
+		puts("■\n");
+	}
+	else{
+		puts("□");
+	}	
 }
 
 
@@ -106,15 +126,21 @@ void rakka(){
 	if (sq.sd <= 0){
 		if (sq.iti[sq.x][sq.y + 1] == 0 && sq.y < 22){
 			locate(sq.x, sq.y);//四角を画面上方に表示
-			printf("　");//空白を挿入
+			puts("　");//空白を挿入
 			sq.y++;//四角を下に落とす
-			hyouji();//再び■表示
+		
+			d_hyouji();//再び■表示
 		}
 		else if (sq.iti[sq.x][sq.y + 1] == 1 || sq.y == 22){
-			sq.iti[sq.x][sq.y] = 1;//位置フラグオン			
-			hyouji();//積み上がった地点で表示しておく
+			
+			sq.iti[sq.x][sq.y] = 1;//位置フラグオン	
+
+			sq.b_type[sq.x][sq.y] = sq.d_type;//積むとき白黒を決める
+			
+			d_hyouji();//積み上がった地点で表示しておく
 			line_chk();//一列チェック
 			sq.x = sq.x_S; sq.y = sq.y_S;//座標初期化
+			type_chk();//次の白黒を決める
 
 		}
 		sq.sd = sq.sd_S;//カウンタ初期化
@@ -137,8 +163,9 @@ void key_chk(){
 				locate(sq.x, sq.y);//四角を消す			
 				printf("　");
 				sq.x -= 2;//左へ
-				locate(sq.x, sq.y);//四角を画面上方に表示
-				printf("■\n");
+				//locate(sq.x, sq.y);//四角を画面上方に表示
+				//printf("■\n");
+				d_hyouji();
 			}
 
 		}
@@ -153,8 +180,9 @@ void key_chk(){
 				printf("　");
 				sq.x += 2;
 
-				locate(sq.x, sq.y);//四角を画面上方に表示
-				printf("■\n");
+				//locate(sq.x, sq.y);//四角を画面上方に表示
+				//printf("■\n");
+				d_hyouji();
 			}
 
 		}
@@ -189,6 +217,10 @@ void line_chk(){
 
 				if (sq.iti[i][j] == 1){
 					sq.iti_tmp[i][j] = 1;//一時的に位置フラグたてる
+
+					sq.b_type_tmp[i][j] = sq.b_type[i][j];//一時的にタイプを入れる
+					sq.b_type[i][j] = -1;
+
 					sq.iti[i][j] = 0;//本フラグオフ
 					locate(i, j);//場所
 					puts("　");//消す						
@@ -200,8 +232,17 @@ void line_chk(){
 			for (j = 0; j < sq.y; j++){
 				if (sq.iti_tmp[i][j] == 1){
 					sq.iti[i][j + 1] = 1;
+
+					sq.b_type[i][j + 1] = sq.b_type_tmp[i][j];
+					
 					locate(i, j + 1);//場所
-					puts("■");//表示	
+
+					if (sq.b_type[i][j+1] == 0){
+						puts("■\n");
+					}
+					else{
+						puts("□");
+					}						
 
 
 				}
@@ -217,6 +258,13 @@ void line_chk(){
 
 
 	}
+}
+
+void type_chk(){
+	if (rand() % 2 == 0)
+		sq.d_type = 0;//白
+	else
+		sq.d_type = 1;//白（中抜き）
 }
 
 
