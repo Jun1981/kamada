@@ -100,13 +100,10 @@ void rakka(){
 			sq.y++;//lŠp‚ğ‰º‚É—‚Æ‚·
 			hyouji();//Ä‚Ñ¡•\¦
 		}
-else
-{
-	sq.x = sq.x_S;
-	sq.y = sq.y_S;
-
-}
-
+		else{
+			sq.x = sq.x_S;
+			sq.y = sq.y_S;
+		}
 	}
 }
 
