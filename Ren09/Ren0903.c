@@ -62,9 +62,9 @@ void main(void){
 				printf(" [%02d] %2d | ",i,BN[i]);
 				for(k=0;k<BN[i];k++){printf("¡");}
 				printf("\n");		
-				Sleep(10);
+				//Sleep(10);
 			}
-			//Sleep(100);
+			Sleep(5);
 		}
 
 	}
