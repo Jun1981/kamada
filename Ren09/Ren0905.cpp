@@ -63,7 +63,7 @@ void sort(int bl[],int x){
 	for(i=0;i<x;i++){//x=20
 		for(j=0;j<(x-1)-i;j++){
 			SetDrawScreen(DX_SCREEN_BACK); // •`‰ææ‚ð— ‰æ–Ê‚Ö
-			ClsDrawScreen(); 
+			ClsDrawScreen(); //— ‰æ–ÊÁ‹Ž
 			cmp++;//”äŠr{‚P			
 
 
@@ -93,7 +93,7 @@ void sort(int bl[],int x){
 
 void showHeader(int x  ,int y){
 
-	DrawFormatStringToHandle(0,0,GetColor(255,255,255),FontHandle1, "[%d] data | compare = %d swap = %d",hdl,x,y);
+	DrawFormatStringToHandle(0,0,GetColor(255,255,255),FontHandle1, "[##] data | compare = %d swap = %d",x,y);
 	DrawFormatStringToHandle(0,20,GetColor(255,255,255),FontHandle1, " ------------------------------------------------------------------------",x,y);
 
 }
