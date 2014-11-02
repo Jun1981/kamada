@@ -1,99 +1,142 @@
-#include <stdio.h>
+ï»¿#include <stdio.h>
 #include <time.h>
 #include<stdlib.h>
 #include<Windows.h>
+#include<string.h>
 #include "../../DxLib/DxLib.h"
 
+#pragma warning(disable:4996)
+
+//å¤‰æ•°å®£è¨€
+
+int FontHandle1,FontHandle2;//ãƒ•ã‚©ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©
+
+const int tekikazu = 100;//æ•µã®æ•°
+const int j_tamakazu=100;//è‡ªæ©Ÿã®å¼¾ã®æ•°
+const int jt_kankaku = 3;//è‡ªæ©Ÿå¼¾ã®ç™ºå°„é–“éš”ã®åˆæœŸå€¤
+const int jt_spd = 10;//è‡ªæ©Ÿå¼¾ã‚¹ãƒ”ãƒ¼ãƒ‰
+int jt_cnt = jt_kankaku;//è‡ªæ©Ÿå¼¾ç™ºå°„ã‚«ã‚¦ãƒ³ãƒˆ
 
 
-//•Ï”éŒ¾
+int Key_Trg, Key_Info, Key_Old;   // ã‚­ãƒ¼æƒ…å ±r
+int ChkKAny;                             // ã¨ã«ã‹ãã‚­ãƒ¼ãŒæŠ¼ã•ã‚ŒãŸã‚‰true
+int GLpCnt;                             // ã‚²ãƒ¼ãƒ ãƒ«ãƒ¼ãƒ—ã‚«ã‚¦ãƒ³ã‚¿
+int i, j, k,l;//ãƒ«ãƒ¼ãƒ—ç”¨
+int title;//ã‚¿ã‚¤ãƒˆãƒ«ç”»åƒèª­ã¿è¾¼ã¿ç”¨
+int bg; //ã‚²ãƒ¼ãƒ æœ¬ç·¨èƒŒæ™¯ç”»åƒç”¨
+int GO;//ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼ç”»é¢èª­ã¿å–ã‚Šç”¨
+int cl;//ã‚¯ãƒªã‚¢ç”»é¢ç”¨
 
-int FontHandle1,FontHandle2;
-
-int Key_Trg, Key_Info, Key_Old;   // ƒL[î•ñr
-int ChkKAny;                             // ‚Æ‚É‚©‚­ƒL[‚ª‰Ÿ‚³‚ê‚½‚çtrue
-int GLpCnt;                             // ƒQ[ƒ€ƒ‹[ƒvƒJƒEƒ“ƒ^
-int i, j, k,l;//ƒ‹[ƒv—p
-int title;//ƒ^ƒCƒgƒ‹‰æ‘œ“Ç‚İ‚İ—p
-int bg; //ƒQ[ƒ€–{•Ò”wŒi‰æ‘œ—p
-int GO;//ƒQ[ƒ€ƒI[ƒo[‰æ–Ê“Ç‚İæ‚è—p
-int cl;//ƒNƒŠƒA‰æ–Ê—p
-
-int ten;//“_”
-int et,t_limit;//ŠÔ
+int ten;//ç‚¹æ•°
+int et,t_limit;//æ™‚é–“
 
 
-int haji=0;//’[ƒtƒ‰ƒO
+int haji=0;//ç«¯ãƒ•ãƒ©ã‚°
 
-//F
-int white,green;
+int d[tekikazu],e[tekikazu];//ï½˜ã¨yã«é€²ã‚€è·é›¢
+
+int tamahaba=0;//å¼¾ã®å¹…
+
+//è‰²
+int white,green,red,blue,purple;
 
 
 //////////
 
-//ƒvƒƒgƒ^ƒCƒvŠÖ”
-void init(void);//‰Šú‰»
-void key_check(void);//ƒL[ƒ`ƒFƒbƒN
-void hyouji(void);//•\¦
+//ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—é–¢æ•°
+void init(void);//åˆæœŸåŒ–
+void key_check(void);//ã‚­ãƒ¼ãƒã‚§ãƒƒã‚¯
+void hyouji(void);//è¡¨ç¤º
 
-int haji_chk(void);//’[ƒ`ƒFƒbƒN
-void game_main(void);//ƒƒCƒ“
+int haji_chk(void);//ç«¯ãƒã‚§ãƒƒã‚¯
+void game_main(void);//ãƒ¡ã‚¤ãƒ³
+
+void idou(void);//æ•µç§»å‹•é–¢æ•°
+
+void jiki_shot(void);//è‡ªæ©Ÿã®å¼¾ã†ã¡é–¢æ•°
 
 
-//\‘¢‘Ì
+
+void jikidan_idou(void);//è‡ªæ©Ÿå¼¾ç§»å‹•
+
+void  atari_chk(void);//è‡ªæ©Ÿå¼¾ã¨æ•µã®å½“ãŸã‚Šãƒã‚§ãƒƒã‚¯
+
+
+//æ§‹é€ ä½“
 struct par{
-	int x;
-	int y;
-	int haji;//’[ƒtƒ‰ƒO
+	int x;//è‡ªæ©Ÿã®åº§æ¨™
+	int y;//è‡ªæ©Ÿã®åº§æ¨™
+	int haji;//ç«¯ãƒ•ãƒ©ã‚°
 
-	int cnt;//‰½ƒ‹[ƒv‚²‚Æ‚É“®‚­‚©
+	int cnt;//ä½•ãƒ«ãƒ¼ãƒ—ã”ã¨ã«å‹•ãã‹
 
-	int haba;//•
+	int haba;//å¹…
 
-	int type;//“G‚Ìƒ^ƒCƒv
+	int type;//æ•µã®ã‚¿ã‚¤ãƒ—
 
-	int x1,y1;//’e‚ÌÀ•W
+	int x1,y1;//å¼¾ã®åº§æ¨™
 
-	int muki;//Œü‚«
+	int muki;//å‘ã
 
-	int sp_x,sp_y;//‚˜‚™•ûŒü‚É‚¢‚­‚çˆÚ“®‚·‚é‚©
+	int sp_x,sp_y;//ï½˜ï½™æ–¹å‘ã«ã„ãã‚‰ç§»å‹•ã™ã‚‹ã‹
+
+	char num[3];//æ•°å­—
+
+	int ten;//ç‚¹æ•°
+
+	int spd;//ã‚¹ãƒ”ãƒ¼ãƒ‰
+
+	int color;//è‰²
+
+	int tmf[j_tamakazu];//å¼¾æ•°
+
+	int tx[j_tamakazu],ty[j_tamakazu];//å¼¾åº§æ¨™
+
+	char tamagura[10];//å¼¾ã®ç”»åƒ
+
+	int tamahaba;//è‡ªæ©Ÿå¼¾ã®å¹…
+
+	int dead;//æ­»äº¡ãƒ•ãƒ©ã‚°
+	
 
 };
 
 struct par jiki;
-struct par teki[10];
+struct par teki[tekikazu];
 
 /////////////////////////////////////////////////////////
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
-{
-	ChangeWindowMode(TRUE);                     // ƒEƒCƒ“ƒhƒEƒ‚[ƒh‚É•ÏX(‚½‚¾‚µA‚Q‚T‚UF)
-	if (DxLib_Init() == -1) {                    // ‚c‚wƒ‰ƒCƒuƒ‰ƒŠ‰Šú‰»ˆ—
-		return -1;                              // ƒGƒ‰[‚ª‹N‚«‚½‚ç’¼‚¿‚ÉI—¹
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
+//
+    ChangeWindowMode(TRUE);                     // ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒ¢ãƒ¼ãƒ‰ã«å¤‰æ›´(ãŸã ã—ã€ï¼’ï¼•ï¼–è‰²)
+	
+	if (DxLib_Init() == -1) {                    // ï¼¤ï¼¸ãƒ©ã‚¤ãƒ–ãƒ©ãƒªåˆæœŸåŒ–å‡¦ç†
+		return -1;                              // ã‚¨ãƒ©ãƒ¼ãŒèµ·ããŸã‚‰ç›´ã¡ã«çµ‚äº†
 	}
-	SetDrawScreen(DX_SCREEN_BACK);              // •`‰ææ‚ğ— ‰æ–Ê‚Ö
+	SetDrawScreen(DX_SCREEN_BACK);              // æç”»å…ˆã‚’è£ç”»é¢ã¸
 
-	init();//‰Šú‰»
+	init();//åˆæœŸåŒ–
 
-	FontHandle1 = CreateFontToHandle(NULL, 40, 4,-1);//ƒ^ƒCƒgƒ‹—pƒtƒHƒ“ƒgƒnƒ“ƒhƒ‰;//ƒtƒHƒ“ƒgƒnƒ“ƒhƒ‰‚P
-	FontHandle2 = CreateFontToHandle(NULL, 16, 8,-1);//ƒQ[ƒ€—pƒtƒHƒ“ƒgƒnƒ“ƒhƒ‰;//ƒtƒHƒ“ƒgƒnƒ“ƒhƒ‰‚Q
 
-	//PlaySoundMem(S1, DX_PLAYTYPE_LOOP);
+	// ã‚²ãƒ¼ãƒ ã‚·ã‚¹ãƒ†ãƒ åˆæœŸåŒ–
+	//------ ã‚²ãƒ¼ãƒ ãƒ«ãƒ¼ãƒ— ------//
+	while (CheckHitKey(KEY_INPUT_ESCAPE) == 0) { // Escã‚­ãƒ¼ãŒæŠ¼ã•ã‚Œã‚‹ã¾ã§ãƒ«ãƒ¼ãƒ—
+		ClsDrawScreen();                        // è£ç”»é¢ã‚¯ãƒªã‚¢
+	
+		
+		key_check();                            // ã‚­ãƒ¼æƒ…å ±å–å¾—
+		game_main();                            // ã‚²ãƒ¼ãƒ ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ãƒ¡ã‚¤ãƒ³
 
-	// ƒQ[ƒ€ƒVƒXƒeƒ€‰Šú‰»
-	//------ ƒQ[ƒ€ƒ‹[ƒv ------//
-	while (CheckHitKey(KEY_INPUT_ESCAPE) == 0) { // EscƒL[‚ª‰Ÿ‚³‚ê‚é‚Ü‚Åƒ‹[ƒv
-		ClsDrawScreen();                        // — ‰æ–ÊƒNƒŠƒA
-		key_check();                            // ƒL[î•ñæ“¾
-		game_main();                            // ƒQ[ƒ€ƒRƒ“ƒgƒ[ƒ‹ƒƒCƒ“
 
-		ScreenFlip();                           // — ‰æ–Ê‚ğ•\‰æ–Ê‚Ö
-		if (ProcessMessage() == -1) {            // ƒƒbƒZ[ƒWˆ—
-			break;                              // ƒGƒ‰[‚ª‹N‚«‚½‚çƒ‹[ƒv‚©‚ç”²‚¯‚é
+
+
+		ScreenFlip();                           // è£ç”»é¢ã‚’è¡¨ç”»é¢ã¸
+		if (ProcessMessage() == -1) {            // ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†
+			break;                              // ã‚¨ãƒ©ãƒ¼ãŒèµ·ããŸã‚‰ãƒ«ãƒ¼ãƒ—ã‹ã‚‰æŠœã‘ã‚‹
 		}
 	}
-	DxLib_End();                                // ‚c‚wƒ‰ƒCƒuƒ‰ƒŠg—p‚ÌI—¹ˆ—
-	return 0;                                        // ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ÌI—¹
+	DxLib_End();// ï¼¤ï¼¸ãƒ©ã‚¤ãƒ–ãƒ©ãƒªä½¿ç”¨ã®çµ‚äº†å‡¦ç†
+	return 0;// ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã®çµ‚äº†
 
 }
 
@@ -102,125 +145,247 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 
 void game_main(){
+	idou();//ç§»å‹•é–¢ä¿‚
+	jiki_shot();//è‡ªæ©Ÿå¼¾
+	//jikidan_idou();//è‡ªæ©Ÿå¼¾ç§»å‹•
+	atari_chk();//è‡ªæ©Ÿå¼¾ã¨æ•µã®å½“ãŸã‚Šãƒã‚§ãƒƒã‚¯
+	hyouji();//è¡¨ç¤º
 
 
-	hyouji();//•\¦
-
-	if(jiki.x>0){
-		//¶
-		if(Key_Info==0x01){
-			jiki.x-=jiki.sp_x;
-
-		}
-	}if(jiki.x+jiki.haba<540){
-		//‰E
-		if(Key_Info==0x02){
-			jiki.x+=jiki.sp_x;
-
-		}
-	}
+	jt_cnt--;//è‡ªæ©Ÿå¼¾ã‚«ã‚¦ãƒ³ãƒˆï¼ï¼‘
 }
 
 
 void init(){	
 	srand((unsigned)time(NULL));
-		
-	white=GetColor(255,255,255);//”’
-	green=GetColor(0,255,0);//—Î
 
-	et=0;//Œo‰ßŠÔ
-	t_limit=60;//§ŒÀŠÔ
-	ten=0;//“¾“_
+	FontHandle1=CreateFontToHandle( "ï¼­ï¼³ ã‚´ã‚·ãƒƒã‚¯", 20,  9, DX_FONTTYPE_NORMAL ) ;  
 
-	//©‹@‚Ì‰ŠúÀ•W
-	jiki.haji=0;//’[‚É‚¢‚é‚©‚Ç‚¤‚©
+	white=GetColor(255,255,255);//ç™½
+	green=GetColor(0,255,0);//ç·‘
+	red=GetColor(255,0,0);//èµ¤
+	blue=GetColor(0,0,255);//é’
+	purple=GetColor(255,0,255);//ç´«
+
+
+	et=0;//çµŒéæ™‚é–“
+	t_limit=60;//åˆ¶é™æ™‚é–“
+	ten=0;//å¾—ç‚¹
+
+	//è‡ªæ©Ÿã®åˆæœŸåº§æ¨™
+
 	jiki.x=320,jiki.y=450;
 
-	jiki.sp_x=3;//©‹@‚Ì‘¬“x
+	jiki.sp_x=3;//è‡ªæ©Ÿã®é€Ÿåº¦
 
-	jiki.haba=GetDrawStringWidth("£",1);
+	jiki.haba=GetDrawStringWidth("â–²",1);//è‡ªæ©Ÿã®å¹…
+
+	strcpy(jiki.tamagura,"â†‘");
+
+	jiki.tamahaba=GetDrawStringWidth(jiki.tamagura,strlen(jiki.tamagura));//
 
 
 
 
-	for (i = 0; i < 10; i++){
-			teki[i].type = rand() % 3 + 1;//“G‚Ì‹­‚³‚ğƒ‰ƒ“ƒ_ƒ€‚ÅŒˆ‚ß‚é
-			if (teki[i].type == 1){
-				teki[i].spd = 10;
-			}
-			else if (teki[i].type == 2){
-				teki[i].spd = 4;
-			}
-			else if (teki[i].type == 3){
-				teki[i].spd = 2;
-			}
+	for (i = 0; i < tekikazu; i++){
+		teki[i].type = rand() % 3 + 1;//æ•µã®å¼·ã•ã‚’ãƒ©ãƒ³ãƒ€ãƒ ã§æ±ºã‚ã‚‹
+		if (teki[i].type == 1){
+			teki[i].cnt = tekikazu;
+			teki[i].spd=1;
+			teki[i].color=green;//è‰²
+
+			teki[i].ten = 3;//ç‚¹
+			strcpy(teki[i].num,"3");
+			teki[i].haba = GetDrawStringWidth("3", strlen("3"));
+		}
+		else if (teki[i].type == 2){
+			teki[i].cnt = 4;
+			teki[i].spd=2;
 			
+			teki[i].color=purple;//è‰²
+
+
+			teki[i].ten = 6;//ç‚¹
+			strcpy(teki[i].num, "6");
+			teki[i].haba = GetDrawStringWidth("6", strlen("6"));
+		}
+		else if (teki[i].type == 3){
+			teki[i].cnt = 2;
+			teki[i].spd=3;
+			teki[i].color=red;//è‰²
+
+			teki[i].ten = 10;//ç‚¹
+			strcpy(teki[i].num,"â‘©");
+			teki[i].haba = GetDrawStringWidth("â‘©", strlen("â‘©"));
 		}
 
-	//’e‚ÌÀ•W
-		for (i = 0; i < 20; i++){
-			teki[i].x1 = -100;
-			teki[i].y1 = -100;
 
-		}
-	//’e‚Ì‰ŠúˆÊ’u‚ÆŒü‚«‚ğƒ‰ƒ“ƒ_ƒ€‚ÅŒˆ‚ß‚é
-		
 
-		for (i = 0; i < 10; i++){
-			teki[i].x = rand() % 66 + 2;
-			teki[i].y = rand() % 18 + 2;
-			teki[i].muki = rand() % 4 + 1;
-			switch (teki[i].muki){
+
+	}
+
+	////å¼¾ã®åº§æ¨™
+	for (i = 0; i < tekikazu; i++){
+		teki[i].x1 = -100;
+		teki[i].y1 = -100;
+
+	}
+	////å¼¾ã®åˆæœŸä½ç½®ã¨å‘ãã‚’ãƒ©ãƒ³ãƒ€ãƒ ã§æ±ºã‚ã‚‹
+
+
+	for (i = 0; i < tekikazu; i++){
+		teki[i].x = rand() % 500 + 20;
+		teki[i].y = rand() % 400 + 20;
+		teki[i].muki = rand() % 4 + 1;
+		switch (teki[i].muki){
 			case 1:
-				teki[i].spd = 1;
-				e[i] = 1;
+				d[i]=teki[i].spd;
+				e[i] = teki[i].spd;
 				break;
 			case 2:
-				d[i] = 1;
-				e[i] = -1;
+				d[i] = teki[i].spd;
+				e[i] = ~teki[i].spd+1;
 				break;
 			case 3:
-				d[i] = -1;
-				e[i] = -1;
+				d[i] = ~teki[i].spd+1;
+				e[i] = teki[i].spd;
 				break;
 			case 4:
-				d[i] = -1;
-				e[i] = -1;
+				d[i] = ~teki[i].spd+1;
+				e[i] = ~teki[i].spd+1;
 				break;
-			}
-
 		}
 
+	}	
 
+	for (i = 0; i < tekikazu; i++){
+		teki[i].dead = 0;//æ•µã¯ç”Ÿãã¦ã„ã‚‹
+
+	}
+
+
+	//è‡ªæ©Ÿã®å¼¾ãƒ•ãƒ©ã‚°ã‚’ï¼ã«
+	for(i=0;i<j_tamakazu;i++){
+
+		jiki.tmf[i]=0;
 	
+	}
+	///////////////////////////
 
 }
 void hyouji(){
-	
-	DrawFormatString(jiki.x,jiki.y,white,"£");
 
-	DrawFormatString(540,20,white,"“¾“_:%d“_",ten);
-	DrawFormatString(540,40,white,"c‚è%d•b",t_limit-et);
 
+	//è‡ªæ©Ÿè¡¨ç¤º
+	DrawFormatStringToHandle(jiki.x,jiki.y,white,FontHandle1,"â–²");
+	/////////////////////////////////////////////////
+
+	//å¾—ç‚¹é–¢ä¿‚è¡¨ç¤º
+	DrawFormatStringToHandle(540,20,green,FontHandle1,"%04dç‚¹",ten);
+	//DrawFormatStringToHandle(540,40,white,FontHandle1,"æ®‹ã‚Š%dç§’",t_limit-et);
+	/////////////////////////////////
+
+
+	//ã‚­ãƒ¼ãƒã‚§ãƒƒã‚¯è¡¨ç¤º
+	DrawFormatStringToHandle(540,60,white,FontHandle1,"%03d",Key_Info);
+	DrawFormatStringToHandle(540,80,white,FontHandle1,"%03d",Key_Trg);
+
+//////////////////////////////////////////////////////
+
+
+
+	//æ•µè¡¨ç¤º
+
+
+	for(i=0;i<tekikazu;i++){
+		if (teki[i].dead == 0){
+			DrawFormatStringToHandle(teki[i].x, teki[i].y, teki[i].color, FontHandle1, "%s", teki[i].num);
+		}
+	}
+
+
+	//è‡ªæ©Ÿå¼¾è¡¨ç¤º
+	for(i=0;i<j_tamakazu;i++){
+
+		if(jiki.tmf[i]==1){
+
+			DrawFormatStringToHandle(jiki.tx[i],jiki.ty[i],white,FontHandle1,"%s",jiki.tamagura);
+
+
+
+
+		}
+		
+	}
+	////////////////////////////////////////////////////////////////
 }
 
 
-void key_check()
-{
+void idou(){
+
+	if(jiki.x>0){
+		//å·¦
+		if( (Key_Info & 0x01) == 0x01){
+			jiki.x-=jiki.sp_x;
+
+		}
+	}if(jiki.x+jiki.haba<540){
+		//å³
+		if( (Key_Info & 0x02) == 0x02){
+			jiki.x+=jiki.sp_x;
+
+		}
+	}
+
+	//æ•µ
+	for (i = 0; i < tekikazu; i++){
+
+		if (teki[i].dead == 0){
+
+			teki[i].x += d[i]; teki[i].y += e[i];//æ•µåº§æ¨™ç§»å‹•
+
+			//ç«¯ã«æ¥ãŸã‚‰åè»¢
+			if (teki[i].x <= 0 || teki[i].x >= 520){
+				d[i] = ~d[i] + 1;
+			}
+			if (teki[i].y <= 0 || teki[i].y >= 430){
+				e[i] = ~e[i] + 1;
+			}
+			////////////////////////
+		}
+	}
+	//è‡ªæ©Ÿå¼¾ç§»å‹•
+	for (i = 0; i<j_tamakazu; i++){
+
+		if (jiki.tmf[i] == 1){
+
+			jiki.ty[i] -= jt_spd;//å¼¾ã‚’ä¸Šã«ç§»å‹•
+		}
+
+		//è‡ªæ©Ÿå¼¾ãŒä¸Šç«¯ã«åˆ°é”ã—ãŸã‚‰
+		if (jiki.ty[i]<-1){
+			jiki.tmf[i] = 0;//å¼¾ãƒ•ãƒ©ã‚°ï¼
+		}
+		///////////////////////
+	}
+
+}
+
+void key_check(){
 
 	/*---------------------
-	*    ƒL[î•ñæ“¾    *
+	*    ã‚­ãƒ¼æƒ…å ±å–å¾—    *
 	*---------------------
 	*
 	*    LEFT  = 0000 0001
 	*    RIGHT = 0000 0010
 	*    UP    = 0000 0100
 	*    DOWN  = 0000 1000
-	*    key_trg‚Í‰Ÿ‚µ‚½uŠÔ‚Ìî•ñ
-	*    key_info‚Í¡‚Ìó‘Ô
+	*    key_trgã¯æŠ¼ã—ãŸç¬é–“ã®æƒ…å ±
+	*    key_infoã¯ä»Šã®çŠ¶æ…‹
 	*
 	*/
-	Key_Trg = Key_Info = 0;                                 // ƒL[î•ñƒNƒŠƒA
+	Key_Trg = Key_Info = 0;                                 // ã‚­ãƒ¼æƒ…å ±ã‚¯ãƒªã‚¢
 	ChkKAny = false;
 	if (CheckHitKey(KEY_INPUT_LEFT))   { Key_Info |= 0x01; }
 	if (CheckHitKey(KEY_INPUT_RIGHT))  { Key_Info |= 0x02; }
@@ -229,7 +394,95 @@ void key_check()
 	if (CheckHitKey(KEY_INPUT_SPACE))  { Key_Info |= 0x10; }
 	if (CheckHitKey(KEY_INPUT_Z))      { Key_Info |= 0x20; }
 	if (CheckHitKey(KEY_INPUT_ESCAPE)) { Key_Info |= 0x40; }
-	if (CheckHitKeyAll()) { ChkKAny = true; }                    // ‚ ‚É[
-	Key_Trg = (Key_Info ^ Key_Old) & Key_Info;          // ƒL[ƒgƒŠƒK[î•ñƒZƒbƒg
-	Key_Old = Key_Info;                                     // ƒL[î•ñƒZ[ƒu
+	if (CheckHitKeyAll()) { ChkKAny = true; }                    // ã‚ã«ãƒ¼
+	Key_Trg = (Key_Info ^ Key_Old) & Key_Info;          // ã‚­ãƒ¼ãƒˆãƒªã‚¬ãƒ¼æƒ…å ±ã‚»ãƒƒãƒˆ
+	Key_Old = Key_Info;                                     // ã‚­ãƒ¼æƒ…å ±ã‚»ãƒ¼ãƒ–
+}
+
+void jiki_shot(){
+
+	if (jt_cnt <= 0){
+		////////////////////////////////è‡ªæ©Ÿå¼¾ã®ã‚«ã‚¦ãƒ³ãƒˆãŒï¼ã«ãªã£ãŸã‚‰
+
+
+		if ((Key_Trg & 0x10) == 0x10){
+			for (i = 0; i < j_tamakazu; i++){
+				if (jiki.tmf[i] == 0){
+					jiki.tmf[i] = 1;
+					jt_cnt = jt_kankaku;//è‡ªæ©Ÿå¼¾ã‚«ã‚¦ãƒ³ãƒˆåˆæœŸåŒ–
+
+					jiki.tx[i] = jiki.x, jiki.ty[i] = jiki.y;//ç¾åœ¨ã®è‡ªæ©Ÿåº§æ¨™ã‚’å¼¾ã®åˆæœŸä½ç½®ã«
+					break;
+				}
+			}
+		}
+		
+		if ((Key_Info & 0x20) == 0x20){//é€£å°„ãƒ¢ãƒ¼ãƒ‰
+
+			for (i = 0; i < j_tamakazu; i++){
+				if (jiki.tmf[i] == 0){
+					jiki.tmf[i] = 1;
+					jt_cnt = jt_kankaku;//è‡ªæ©Ÿå¼¾ã‚«ã‚¦ãƒ³ãƒˆåˆæœŸåŒ–
+
+					jiki.tx[i] = jiki.x, jiki.ty[i] = jiki.y;//ç¾åœ¨ã®è‡ªæ©Ÿåº§æ¨™ã‚’å¼¾ã®åˆæœŸä½ç½®ã«
+					break;
+				}
+			}
+		}
+
+		////////////////////////////////////
+	}
+
+}
+
+
+
+//void jikidan_idou(void){
+//
+//	for (i = 0; i < j_tamakazu; i++){
+//
+//		if (jiki.tmf[i] == 1){
+//
+//			jiki.ty[i] -= jt_spd;//å¼¾ã‚’ä¸Šã«ç§»å‹•
+//		}
+//
+//		//è‡ªæ©Ÿå¼¾ãŒä¸Šç«¯ã«åˆ°é”ã—ãŸã‚‰
+//		if (jiki.ty[i] < -1){
+//			jiki.tmf[i] = 0;//å¼¾ãƒ•ãƒ©ã‚°ï¼
+//		}
+//		///////////////////////
+//	}
+//
+//
+//
+//}
+
+void atari_chk(){
+
+
+	for(i=0;i<j_tamakazu;i++){
+		for(j=0;j<tekikazu;j++){
+
+
+			if (jiki.tmf[i] == 1 && teki[j].dead==0){
+				if  ( (jiki.tx[i] + jiki.tamahaba) > teki[j].x      &&    jiki.tx[i] < (teki[j].x + teki[j].haba) && jiki.ty[i] <= (teki[j].y + 5) && (jiki.ty[i] + 5) >= teki[j].y){//ã®å½“ãŸã‚Šåˆ¤å®š
+					
+
+
+						ten += teki[j].ten;
+						jiki.tmf[i] = 0;//è‡ªæ©Ÿã®å¼¾ãƒ•ãƒ©ã‚°OFF
+						jiki.tx[i] = jiki.ty[i] = -100;//è‡ªæ©Ÿå¼¾åº§æ¨™ã‚’ç”»é¢å¤–
+						
+						teki[j].dead = 1;//æ•µæ­»äº¡
+						teki[j].x = teki[j].y = -100;//æ•µåº§æ¨™ã‚’ç”»é¢å¤–ã«
+						break;
+
+					}
+				
+			}
+		}
+
+
+
+	}
 }
