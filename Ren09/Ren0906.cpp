@@ -11,7 +11,7 @@
 
 int FontHandle1,FontHandle2;//フォントハンドラ
 
-const int tekikazu = 100;//敵の数
+const int tekikazu = 1000;//敵の数
 const int j_tamakazu=100;//自機の弾の数
 const int jt_kankaku = 3;//自機弾の発射間隔の初期値
 const int jt_spd = 10;//自機弾スピード
